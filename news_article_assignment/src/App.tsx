@@ -1,7 +1,10 @@
-import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import NewsForm from "./component/NewsForm.tsx";
-import ArticlesPage from "./component/ArticlesPage.tsx"; 
+import React from 'react';
+import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import NewsForm from './component/NewsForm.tsx';
+import ArticlesPage from './component/ArticlesPage.tsx';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 const App: React.FC = () => {
   return (
