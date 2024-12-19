@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { NewsArticle } from "../model/model";
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import axios from 'axios';
 
 const NewsForm: React.FC = () => {
   // -- Routing ---
@@ -37,25 +38,32 @@ const NewsForm: React.FC = () => {
 
     if (!formData.title) newErrors.title = "Title is required"; 
     // Take the negative of it. Eg. If form in "Title" is null -> string will append it to the newError Array
-    
     if (!formData.summary) newErrors.summary = "Summary is required";
     if (!formData.date) newErrors.date = "Date is required";
     if (!formData.publisher) newErrors.publisher = "Publisher is required";
 
     if (Object.keys(newErrors).length > 0) { //If there is no error in the newError array -> then send out
-      setErrors(newErrors); // if not, save the setError into the "errors"
-    } else {
-      // Placeholder for Axio post request
-      console.log("Form submitted with values:", formData);
-
-      // Reset form after submit
-      setFormData({
-        title: "",
-        summary: "",
-        date: "",
-        publisher: "",
-      });
-    }
+        setErrors(newErrors);
+      } else {
+        // Placeholder URL for your API endpoint (replace with your actual API URL)
+        axios.post('https://localhost:8080/articles', formData)
+          .then((response) => {
+            console.log('Article submitted successfully:', response.data);
+            alert('Entry have been submitted successfully. Entry Id: ' + response.data.id); //Expecting id number from SQL generated, see models ->  Article
+            // Reset form
+            setFormData({
+              title: "",
+              summary: "",
+              date: "",
+              publisher: "",
+            });
+          })
+          .catch((error) => {
+            console.error('Error submitting article:', error);
+            alert('Error submitting article: ' + error.message);
+          });
+      }
+    
   };
 
   return (
