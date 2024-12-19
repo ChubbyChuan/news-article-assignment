@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { NewsArticle } from "../model/model";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Article } from "../model/model"; // Ensure you import Article
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
@@ -9,8 +9,13 @@ const NewsForm: React.FC = () => {
   // -- Routing ---
   const navigate = useNavigate();
 
+  // Retrieve the state from /articlepage
+  const location = useLocation();
+  const article = location.state?.article;
+
   // --- State Management ---
-  const [formData, setFormData] = useState<NewsArticle>({
+  const [formData, setFormData] = useState<Article>({
+    id: 0, // Default value for id if it is creating.
     title: "",
     summary: "",
     date: "",
@@ -18,7 +23,20 @@ const NewsForm: React.FC = () => {
   });
 
   // --- Error handling ---
-  const [errors, setErrors] = useState<Partial<NewsArticle>>({});
+  const [errors, setErrors] = useState<Partial<Article>>({});
+
+  // UseEffect to pre-fill the form when an article is passed (i.e., for editing)
+  useEffect(() => {
+    if (article) {
+      setFormData({
+        id: article.id,  // Pre-fill the ID as well if editing
+        title: article.title,
+        summary: article.summary,
+        date: article.date,
+        publisher: article.publisher,
+      });
+    }
+  }, [article]);
 
   // --- Handle Form Input Changes ---
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -33,42 +51,43 @@ const NewsForm: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validation checks -> Instantiating an instance of "NewError"
-    const newErrors: Partial<NewsArticle> = {};
+    // Validation checks -> Instantiating an instance of "ArticleError"
+    const newErrors: Partial<Article> = {};
 
-    if (!formData.title) newErrors.title = "Title is required"; 
-    // Take the negative of it. Eg. If form in "Title" is null -> string will append it to the newError Array
+    if (!formData.title) newErrors.title = "Title is required";
     if (!formData.summary) newErrors.summary = "Summary is required";
     if (!formData.date) newErrors.date = "Date is required";
     if (!formData.publisher) newErrors.publisher = "Publisher is required";
 
-    if (Object.keys(newErrors).length > 0) { //If there is no error in the newError array -> then send out
-        setErrors(newErrors);
-      } else {
-        // Placeholder URL for your API endpoint (replace with your actual API URL)
-        axios.post('https://localhost:8080/articles', formData)
-          .then((response) => {
-            console.log('Article submitted successfully:', response.data);
-            alert('Entry have been submitted successfully. Entry Id: ' + response.data.id); //Expecting id number from SQL generated, see models ->  Article
-            // Reset form
-            setFormData({
-              title: "",
-              summary: "",
-              date: "",
-              publisher: "",
-            });
-          })
-          .catch((error) => {
-            console.error('Error submitting article:', error);
-            alert('Error submitting article: ' + error.message);
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+    } else {
+      // If id is more than 0, it is an update. Post with path id variable
+      const url = formData.id === 0 ?  'https://localhost:8080/articles': `https://localhost:8080/articles/${article.id}`;
+ 
+      axios.post(url, formData)
+        .then((response) => {
+          console.log('Article submitted successfully:', response.data);
+          alert('Entry has been submitted successfully. Entry Id: ' + response.data.id);
+          setFormData({
+            id: 0,
+            title: "",
+            summary: "",
+            date: "",
+            publisher: "",
           });
-      }
-    
+          navigate("/articles"); // Navigate back to articles page after submission
+        })
+        .catch((error) => {
+          console.error('Error submitting article:', error);
+          alert('Error submitting article: ' + error.message);
+        });
+    }
   };
 
   return (
     <div className="container my-4">
-      <h1 className="mb-4">Create/Update News Article</h1>
+      <h1 className="mb-4">{article ? "Update News Article" : "Create News Article"}</h1>
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3" controlId="title">
           <Form.Label>Article Title</Form.Label>
@@ -78,9 +97,9 @@ const NewsForm: React.FC = () => {
             name="title"
             value={formData.title}
             onChange={handleChange}
-            isInvalid={!!errors.title}  //Check if the error.title exist
+            isInvalid={!!errors.title}  
           />
-          {errors.title && (            //if error.title + form.invalid Triggered -> then display whatever is in "error"
+          {errors.title && (
             <Form.Control.Feedback type="invalid">
               {errors.title}
             </Form.Control.Feedback>

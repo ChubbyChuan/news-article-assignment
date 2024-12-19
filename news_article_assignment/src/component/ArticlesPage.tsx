@@ -13,35 +13,35 @@ const ArticlesPage: React.FC = () => {
       id: 1,
       title: "Introduction to React",
       summary: "Learn the basics of React, a JavaScript library for building user interfaces.",
-      date: "2024-12-18T12:00:00Z",
+      date: "2024-12-18",
       publisher: "Tech World"
     },
     {
       id: 2,
       title: "Advanced React Patterns",
       summary: "Explore advanced patterns and techniques in React for building scalable applications.",
-      date: "2024-12-17T15:30:00Z",
+      date: "2024-12-17",
       publisher: "React Mastery"
     },
     {
       id: 3,
       title: "Understanding Redux in React",
       summary: "Dive deep into state management with Redux in React applications.",
-      date: "2024-12-15T09:45:00Z",
+      date: "2024-12-15",
       publisher: "JS Insights"
     },
     {
       id: 4,
       title: "Web Development Best Practices",
       summary: "A guide to best practices in modern web development using JavaScript and React.",
-      date: "2024-12-14T10:00:00Z",
+      date: "2024-12-14",
       publisher: "Web Dev Academy"
     },
     {
       id: 5,
       title: "Mastering TypeScript",
       summary: "Understand the fundamentals of TypeScript and how it enhances JavaScript development.",
-      date: "2024-12-13T14:30:00Z",
+      date: "2024-12-13",
       publisher: "Code School"
     }
   ];
